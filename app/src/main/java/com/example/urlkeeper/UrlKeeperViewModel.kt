@@ -3,6 +3,12 @@ package com.example.urlkeeper
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 
 class UrlKeeperViewModel : ViewModel() {
 
@@ -11,25 +17,18 @@ class UrlKeeperViewModel : ViewModel() {
     val urls
         get() = stateUrlsList.toList()
 
-    private fun addPage(url: String) {
+    private fun addPage(
+        title: String,
+        description: String,
+        url: String
+    ) {
         stateUrlsList.add(
             Page(
-                "测试标题",
-                "测试文本",
+                title,
+                description,
                 url = url
             )
         )
-    }
-
-    // loading
-    private val _loading = mutableStateOf(false)
-    val loading
-        get() = _loading.value
-    fun startLoading() {
-        _loading.value = true
-    }
-    fun finishLoading() {
-        _loading.value = false
     }
 
     // dialog
@@ -47,10 +46,16 @@ class UrlKeeperViewModel : ViewModel() {
 
     fun comformUrlAddingDialog(url: String) {
         _urlAddingDialogExpanded.value = false
-        startLoading()
 
-       addPage(url)
-        finishLoading()
+        viewModelScope.launch {
+            val res = withContext(Dispatchers.IO) {
+                async {
+                    Jsoup.connect(url).get().title()
+                }
+            }.await()
+
+            addPage(res, "描述", url)
+        }
     }
 
     init {

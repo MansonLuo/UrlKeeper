@@ -66,6 +66,10 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
+    // http request
+    //implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha1")
+    implementation("org.jsoup:jsoup:1.16.2")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

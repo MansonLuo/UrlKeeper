@@ -118,13 +118,6 @@ fun App() {
                 onComform = { vm.comformUrlAddingDialog(it) },
                 onDismiss = { vm.dismissUrlAddingDialog() }
             )
-
-
-            CircularProgressIndicator(
-                modifier = Modifier.width(64.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                strokeWidth = 8.dp
-            )
         }
     }
 }
