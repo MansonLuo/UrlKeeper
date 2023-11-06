@@ -1,7 +1,7 @@
 package com.example.urlkeeper
 
 data class Page(
-    val title: String,
-    val description: String,
+    var title: String,
+    var description: String,
     val url: String
 )

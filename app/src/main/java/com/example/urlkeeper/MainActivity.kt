@@ -3,7 +3,9 @@ package com.example.urlkeeper
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -93,7 +95,7 @@ fun App() {
     ) { paddingValues ->
 
         Box(
-            modifier =Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -105,33 +107,40 @@ fun App() {
 
                     if (index > 0) Divider()
 
-                    PageItem(page = item) {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Not implemented.")
+                    PageItem(
+                        page = item,
+                        onClick = {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Click not implemented yet.")
+                            }
+                        },
+                        onLongClick = {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Long click not implemented yet.")
+                            }
                         }
-                    }
+                    )
                 }
             }
-
-            UrlAddingAlertDialog(
-                expended = vm.urlAddingDialogExpanded,
-                onComform = { vm.comformUrlAddingDialog(it) },
-                onDismiss = { vm.dismissUrlAddingDialog() }
-            )
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PageItem(
     page: Page,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -158,7 +167,8 @@ fun Preview_PageItem() {
     val vm = viewModel<UrlKeeperViewModel>()
     PageItem(
         page = vm.urls.first(),
-        onClick = {}
+        onClick = {},
+        onLongClick = {}
     )
 }
 
@@ -210,5 +220,58 @@ fun Preview_UrlAddingAlertDialog() {
         true,
         {},
         {}
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PageItemDetailModifyDialog(
+    title: String,
+    description: String,
+    expanded: Boolean,
+    onConfirm: (String, String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var innerTitle by remember {
+        mutableStateOf(title)
+    }
+    var innerDescription by remember {
+        mutableStateOf(description)
+    }
+
+    if (!expanded) {
+        return
+    }
+
+    AlertDialog(
+        title = {
+            Text(text = "修改")
+        },
+        text = {
+            TextField(
+                value = innerTitle,
+                onValueChange = { innerTitle = it },
+                placeholder = {
+                    Text(text = "Title...")
+                }
+            )
+            TextField(
+                value = innerDescription,
+                onValueChange = { innerDescription = it },
+                placeholder = {
+                    Text(text = "Description...")
+                }
+            )
+        },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm(innerTitle, innerDescription)
+                }
+            ) {
+                Text(text = "Comfirm")
+            }
+        }
     )
 }

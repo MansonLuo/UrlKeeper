@@ -31,7 +31,7 @@ class UrlKeeperViewModel : ViewModel() {
         )
     }
 
-    // dialog
+    // Create Pagge item dialog
     private val _urlAddingDialogExpanded = mutableStateOf(false)
     val urlAddingDialogExpanded
         get() = _urlAddingDialogExpanded.value
@@ -56,6 +56,30 @@ class UrlKeeperViewModel : ViewModel() {
 
             addPage(res, "描述", url)
         }
+    }
+
+    // Modify page item detail dialog
+    private var _pageItemDetailModifyDialogExpanded = mutableStateOf(false)
+    val pageItemDetailModifyDialogExpanded
+        get() = _pageItemDetailModifyDialogExpanded.value
+    private var _currentModifiedPageItemId = mutableStateOf(0)
+    val currentModifiedPageItemId
+        get() = _currentModifiedPageItemId.value
+    fun showPageItemDetailModifyDialog(pageItemId: Int) {
+        _pageItemDetailModifyDialogExpanded.value = true
+        _currentModifiedPageItemId.value = pageItemId
+    }
+
+    fun dismissPageItemDetailModifyDialog() {
+        _pageItemDetailModifyDialogExpanded.value = false
+    }
+
+    fun confirmPageItemModifiedDialog(title: String, description: String) {
+        var item = stateUrlsList.get(_currentModifiedPageItemId.value)
+        item.title = title
+        item.description = description
+
+        dismissPageItemDetailModifyDialog()
     }
 
     init {
